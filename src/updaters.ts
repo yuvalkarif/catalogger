@@ -1,4 +1,4 @@
-import type { DependencyMap, DependencyPresenceDetails } from './types';
+import type { DependencyPresenceDetails } from './types';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -28,9 +28,8 @@ async function updateWorkpaceFile({ dependenciesDetails, cwd }: { dependenciesDe
 
 async function updatePackageJsonFiles({ dependenciesDetails }: { dependenciesDetails: DependencyPresenceDetails[] }) {
   // Process one dependency one at a time, doing it in parallel seem to break some files.
-  dependenciesDetails.map(async (depDetail) => {
+  for (const depDetail of dependenciesDetails) {
     const { dependencyName } = depDetail;
-
     for (const packagesToUpdate of depDetail.packages) {
       const { packagePath } = packagesToUpdate;
       await updatePackageVersion({
@@ -39,7 +38,7 @@ async function updatePackageJsonFiles({ dependenciesDetails }: { dependenciesDet
         packageName: dependencyName,
       });
     }
-  });
+  };
 }
 
 async function updatePackageVersion(options: { cwd: string; newVersion: string; packageName: string }) {
@@ -49,7 +48,7 @@ async function updatePackageVersion(options: { cwd: string; newVersion: string; 
   const content = await readFile(packagePath, { encoding: 'utf-8' });
   const packageJson = JSON.parse(content);
 
-  const dependencyTypes: DependencyMap[keyof DependencyMap][] = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+  const dependencyTypes = ['dependencies', 'devDependencies'];
 
   for (const type of dependencyTypes) {
     if (packageJson[type]?.[packageName]) {

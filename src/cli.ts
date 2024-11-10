@@ -44,7 +44,7 @@ const main = defineCommand({
       return reportAsJson({ dependenciesDetails });
     }
 
-    reportAsText({ dependenciesDetails });
+    reportAsText({ dependenciesDetails, shouldUpdate });
   },
 });
 
