@@ -24,6 +24,14 @@ const main = defineCommand({
       default: false,
       valueHint: 'boolean',
     },
+    interactive: {
+      type: 'boolean',
+      description: 'Update while in interactive mode',
+      alias: ['i'],
+      default: false,
+      valueHint: 'boolean',
+    },
+
     cwd: {
       type: 'positional',
       description: 'Current working directory',
@@ -31,8 +39,10 @@ const main = defineCommand({
       required: false,
     },
   },
-  run: async ({ args }) => {
-    const { json: outputAsJson, update: shouldUpdate, cwd = getCwd() } = args;
+
+  run: async (context) => {
+    const { args } = context;
+    const { json: outputAsJson, update: shouldUpdate, cwd = getCwd(), interactive = false } = args;
 
     const dependenciesDetails = await getPackagesByDependencies({ cwd });
 
